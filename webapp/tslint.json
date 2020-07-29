@@ -22,7 +22,8 @@
     "no-string-literal": false,
     "jsx-no-multiline-js": false,
     "jsx-boolean-value": false,
-    "no-implicit-dependencies": false
+    "no-implicit-dependencies": false,
+    "no-eval": false
   },
   "linterOptions": {
     "exclude": ["**/*.js"]

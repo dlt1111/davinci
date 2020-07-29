@@ -34,7 +34,8 @@ export const initialState: IWidgetState = {
   loading: false,
   dataLoading: false,
   columnValueLoading: false,
-  distinctColumnValues: null
+  distinctColumnValues: null,
+  customPlugin: null
 }
 
 const widgetReducer = (
@@ -148,6 +149,15 @@ const widgetReducer = (
       case ActionTypes.CLEAR_CURRENT_WIDGET:
         draft.currentWidget = null
         break
+      case ActionTypes.LOAD_CUSTOM_PLUGIN_SUCCESS:
+        draft.customPlugin = action.payload.data
+        break
+      case ActionTypes.EDIT_CUSTOM_PLUGIN: {
+        const { fieldArr, key, value } = action.payload
+        const customObj = fieldArr?.reduce((pre, cur) => pre[cur], draft.customPlugin)
+        customObj[key] = value
+        break
+      }
     }
   })
 

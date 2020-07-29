@@ -14,7 +14,14 @@ import { hideNavigator } from 'containers/App/actions'
 import { ViewActions } from 'containers/View/actions'
 const { loadViews, loadViewsDetail, loadViewData, loadViewDistinctValue } = ViewActions
 import { WidgetActions } from 'containers/Widget/actions'
-import { makeSelectCurrentWidget, makeSelectLoading, makeSelectDataLoading, makeSelectDistinctColumnValues, makeSelectColumnValueLoading } from 'containers/Widget/selectors'
+import {
+  makeSelectCurrentWidget,
+  makeSelectLoading,
+  makeSelectDataLoading,
+  makeSelectDistinctColumnValues,
+  makeSelectColumnValueLoading,
+  makeSelectCustomPlugin
+} from 'containers/Widget/selectors'
 import { makeSelectViews, makeSelectFormedViews } from 'containers/View/selectors'
 
 import { RouteComponentWithParams } from 'utils/types'
@@ -35,6 +42,7 @@ import { IDistinctValueReqeustParams } from 'app/components/Control/types'
 import { IReference } from './Reference/types'
 import { IWorkbenchSettings, WorkbenchQueryMode } from './types'
 import { widgetDimensionMigrationRecorder, barChartStylesMigrationRecorder } from 'utils/migrationRecorders'
+import { ICustomPlugin } from '../../types'
 
 const styles = require('./Workbench.less')
 
@@ -49,7 +57,7 @@ export interface IWidget {
   publish: boolean
 }
 
-interface IWorkbenchProps {
+export interface IWorkbenchProps {
   views: IViewBase[]
   formedViews: IFormedViews
   currentWidget: IWidget
@@ -57,6 +65,7 @@ interface IWorkbenchProps {
   dataLoading: boolean
   distinctColumnValues: any[]
   columnValueLoading: boolean
+  customPlugin: ICustomPlugin
   onHideNavigator: () => void
   onLoadViews: (projectId: number, resolve?: any) => void
   onLoadViewDetail: (viewId: number, resolve: () => void) => void
@@ -72,6 +81,13 @@ interface IWorkbenchProps {
   onLoadViewDistinctValue: (viewId: number, params: Partial<IDistinctValueReqeustParams>) => void
   onClearCurrentWidget: () => void
   onExecuteComputed: (sql: string) => void
+  onLoadCustomPlugin: (cb?: (data: ICustomPlugin) => void) => void
+  /**
+   * @param { string[] } fieldArr - the path key of the customPlugin of object
+   * @param { string } key - the field that you want to change its value
+   * @param { any } value - the value of modified
+   */
+  onEditCustomPlugin: (fieldArr: string[], key: string, value: any) => void
 }
 
 interface IWorkbenchStates {
@@ -101,7 +117,7 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
   private defaultSplitSize = 440
   private maxSplitSize = this.defaultSplitSize * 1.5
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const splitSize = +localStorage.getItem('workbenchSplitSize') || this.defaultSplitSize
     this.state = {
@@ -161,6 +177,7 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
 
   public componentDidMount () {
     this.props.onHideNavigator()
+    this.getCustomChartInfo()
   }
 
   public componentWillReceiveProps (nextProps: IWorkbenchProps) {
@@ -208,6 +225,10 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
       throw new Error(err)
     }
     return workbenchSettings
+  }
+
+  private getCustomChartInfo = () => {
+    this.props.onLoadCustomPlugin()
   }
 
   private changeName = (e) => {
@@ -262,7 +283,7 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
       this.setState({
         originalComputed: originalComputed.filter((oc) => oc.id !== computeField.id)
       }, () => {
-        const {originalComputed, computed} = this.state
+        const { originalComputed, computed } = this.state
         const widget = {
           name,
           description,
@@ -282,14 +303,14 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
           publish: true
         }
         if (id) {
-          onEditWidget({...widget, id}, () => void 0)
+          onEditWidget({ ...widget, id }, () => void 0)
         }
       })
     } else if (from === 'computed') {
       this.setState({
         computed: computed.filter((cm) => cm.id !== computeField.id)
       }, () => {
-        const {originalComputed, computed} = this.state
+        const { originalComputed, computed } = this.state
         const widget = {
           name,
           description,
@@ -309,21 +330,21 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
           publish: true
         }
         if (id) {
-          onEditWidget({...widget, id}, () => void 0)
+          onEditWidget({ ...widget, id }, () => void 0)
         }
       })
     }
   }
 
   private setComputed = (computeField) => {
-    const {computed, originalComputed} = this.state
-    const {from, sqlExpression} = computeField
+    const { computed, originalComputed } = this.state
+    const { from, sqlExpression } = computeField
     // todo  首先做sql合法校验； sqlExpression
     let isEdit = void 0
     let newComputed = null
     if (from === 'originalComputed') {
       isEdit = originalComputed ? originalComputed.some((cm) => cm.id === computeField.id) : false
-      newComputed =  isEdit ? originalComputed.map((cm) => {
+      newComputed = isEdit ? originalComputed.map((cm) => {
         if (cm.id === computeField.id) {
           return computeField
         } else {
@@ -335,7 +356,7 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
       })
     } else if (from === 'computed') {
       isEdit = computed.some((cm) => cm.id === computeField.id)
-      newComputed =  isEdit ? computed.map((cm) => {
+      newComputed = isEdit ? computed.map((cm) => {
         if (cm.id === computeField.id) {
           return computeField
         } else {
@@ -410,7 +431,7 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
       publish: true
     }
     if (id) {
-      onEditWidget({...widget, id}, () => {
+      onEditWidget({ ...widget, id }, () => {
         message.success('修改成功')
         const editSignDashboard = sessionStorage.getItem('editWidgetFromDashboard')
         const editSignDisplay = sessionStorage.getItem('editWidgetFromDisplay')
@@ -513,8 +534,10 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
       dataLoading,
       distinctColumnValues,
       columnValueLoading,
+      customPlugin,
       onLoadViewData,
-      onLoadViewDistinctValue
+      onLoadViewDistinctValue,
+      onEditCustomPlugin
     } = this.props
     const {
       name,
@@ -540,10 +563,12 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
     const hasDataConfig = !!(cols.length || rows.length || metrics.length)
     const maskProps: IDashboardItemMaskProps = {
       loading: dataLoading,
-      chartType: selectedChart,
+      chartType: selectedChart as number,
       empty: !data.length,
       hasDataConfig
     }
+    const customPluginModulesConfig = customPlugin?.modules
+    const customModuleSelected = typeof selectedChart === 'string' && customPluginModulesConfig?.[selectedChart]
 
     return (
       <div className={styles.workbench}>
@@ -586,6 +611,7 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
                 queryMode={queryMode}
                 multiDrag={multiDrag}
                 computed={computed}
+                customPluginModulesConfig={customPluginModulesConfig}
                 onViewSelect={this.viewSelect}
                 onChangeAutoLoadData={this.changeAutoLoadData}
                 onSetControls={this.setControls}
@@ -602,11 +628,13 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
                 <div className={styles.widgetBlock}>
                   <Widget
                     {...widgetProps}
-                    loading={<DashboardItemMask.Loading {...maskProps}/>}
-                    empty={<DashboardItemMask.Empty {...maskProps}/>}
+                    customModuleSelected={customModuleSelected}
+                    loading={<DashboardItemMask.Loading {...maskProps} />}
+                    empty={<DashboardItemMask.Empty {...maskProps} />}
                     editing={true}
                     onPaginationChange={this.paginationChange}
                     onChartStylesChange={this.chartStylesChange}
+                    onEditCustomPlugin={onEditCustomPlugin}
                   />
                 </div>
               </div>
@@ -631,7 +659,8 @@ const mapStateToProps = createStructuredSelector({
   loading: makeSelectLoading(),
   dataLoading: makeSelectDataLoading(),
   distinctColumnValues: makeSelectDistinctColumnValues(),
-  columnValueLoading: makeSelectColumnValueLoading()
+  columnValueLoading: makeSelectColumnValueLoading(),
+  customPlugin: makeSelectCustomPlugin()
 })
 
 export function mapDispatchToProps (dispatch) {
@@ -645,7 +674,9 @@ export function mapDispatchToProps (dispatch) {
     onEditWidget: (widget, resolve) => dispatch(WidgetActions.editWidget(widget, resolve)),
     onLoadViewDistinctValue: (viewId, params) => dispatch(loadViewDistinctValue(viewId, params)),
     onClearCurrentWidget: () => dispatch(WidgetActions.clearCurrentWidget()),
-    onExecuteComputed: (sql) => dispatch(WidgetActions.executeComputed(sql))
+    onExecuteComputed: (sql) => dispatch(WidgetActions.executeComputed(sql)),
+    onLoadCustomPlugin: (cb?) => dispatch(WidgetActions.loadCustomPlugin(cb)),
+    onEditCustomPlugin: (fieldArr, key, value) => dispatch(WidgetActions.editCustomPlugin(fieldArr, key, value))
   }
 }
 

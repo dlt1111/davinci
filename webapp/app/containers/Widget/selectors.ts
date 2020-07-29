@@ -54,6 +54,10 @@ const makeSelectColumnValueLoading = () => createSelector(
   (widgetState) => widgetState.columnValueLoading
 )
 
+const makeSelectCustomPlugin = () => createSelector(
+  selectWidget,
+  (widgetState) => widgetState.customPlugin
+)
 export {
   selectWidget,
   makeSelectWidgets,
@@ -61,5 +65,6 @@ export {
   makeSelectLoading,
   makeSelectDataLoading,
   makeSelectDistinctColumnValues,
-  makeSelectColumnValueLoading
+  makeSelectColumnValueLoading,
+  makeSelectCustomPlugin
 }

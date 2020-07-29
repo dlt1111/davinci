@@ -1,3 +1,4 @@
+import { CustomPluginHooks } from './components/Custom/index';
 /*
  * <<
  * Davinci
@@ -19,6 +20,7 @@
  */
 
 import { IWidgetConfig } from './components/Widget'
+import { IChartInfo } from 'app/containers/Widget/components/Widget'
 
 export interface IWidgetBase {
   id: number
@@ -39,6 +41,27 @@ export interface IWidgetFormed extends IWidgetBase {
   dataToken?: string
 }
 
+export interface ICustomModule {
+  deps: string[]
+  config: {
+    chartInfo: IChartInfo
+    dimetionsCount: number
+    metricsCount: number
+  },
+  isLoaded?: boolean,
+  /**
+   * Render field must be a function or string. If it is string, it means a link to the render function in other file
+   */
+  render: (hooks: CustomPluginHooks, id: string) => any | string
+}
+export interface ICustomPlugin {
+  commonDeps: string[]
+  modules: {
+    [moduleName: string]: ICustomModule
+  },
+  isLoaded?: boolean
+}
+
 export interface IWidgetState {
   widgets: IWidgetFormed[]
   currentWidget: IWidgetRaw
@@ -46,4 +69,5 @@ export interface IWidgetState {
   dataLoading: boolean
   columnValueLoading: boolean
   distinctColumnValues: any[]
+  customPlugin: ICustomPlugin
 }

@@ -8,7 +8,7 @@ const webpack = require('webpack')
 const HappyPack = require('happypack')
 const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length })
 const overrideLessVariables = require('../../app/assets/override/lessVariables')
-
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 // Remove this line once the following warning goes away (it was meant for webpack loader authors not users):
 // 'DeprecationWarning: loaderUtils.parseQuery() received a non-string value which can be problematic,
 // see https://github.com/webpack/loader-utils/issues/56 parseQuery() will be replaced with getOptions()
@@ -210,6 +210,7 @@ module.exports = options => ({
       threadPool: happyThreadPool,
       verbose: true
     }),
+    new HardSourceWebpackPlugin()
   ]),
   resolve: {
     modules: ['node_modules', 'app'],

@@ -32,6 +32,8 @@ import { IQueryVariableMap } from 'containers/Dashboard/types'
 import { ILocalControl } from 'app/components/Control/types'
 import { RichTextNode } from 'app/components/RichText'
 import { IReference } from '../Workbench/Reference/types'
+import { ICustomModule } from '../../types'
+import { IWorkbenchProps } from '../Workbench'
 const styles = require('../Pivot/Pivot.less')
 
 export type DimetionType = 'row' | 'col'
@@ -133,7 +135,7 @@ interface IWidgetConfigBase {
   secondaryMetrics?: IWidgetSecondaryMetric[]
   filters: IWidgetFilter[]
   chartStyles: IChartStyles
-  selectedChart: number
+  selectedChart: number | string
   color?: IDataParamProperty
   label?: IDataParamProperty
   size?: IDataParamProperty
@@ -162,6 +164,8 @@ export interface IWidgetProps extends IWidgetConfigBase {
   isDrilling?: boolean
   whichDataDrillBrushed?: boolean | object[]
   selectedItems?: number[]
+  customModuleSelected?: ICustomModule
+  onEditCustomPlugin?: IWorkbenchProps['onEditCustomPlugin']
   onSelectChartsItems?: (selectedItems: number[]) => void
   // onHideDrillPanel?: (swtich: boolean) => void
   onError?: (error: Error) => void

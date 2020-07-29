@@ -46,8 +46,14 @@ enum Types {
   DELETE_WIDGET_FAILURE = 'davinci/Widget/DELETE_WIDGET_FAILURE',
 
   CLEAR_CURRENT_WIDGET = 'davinci/Widget/CLEAR_CURRENT_WIDGET',
-  EXECUTE_COMPUTED_SQL = 'davinci/Widget/EXECUTE_COMPUTED_SQL'
+  EXECUTE_COMPUTED_SQL = 'davinci/Widget/EXECUTE_COMPUTED_SQL',
+
+  LOAD_CUSTOM_PLUGIN = 'davinci/Widget/LOAD_CUSTOM_PLUGIN',
+  LOAD_CUSTOM_PLUGIN_SUCCESS = 'davinci/Widget/LOAD_CUSTOM_PLUGIN_SUCCESS',
+  EDIT_CUSTOM_PLUGIN = 'davinci/Widget/EDIT_CUSTOM_PLUGIN'
 }
+
+export const CUSTOM_ID_LOWEST_LIMIT = 100
 
 export const ActionTypes = createTypes(Types)
 

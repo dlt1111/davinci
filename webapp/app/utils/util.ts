@@ -181,3 +181,14 @@ export function isImagePath(pathname: string) {
 export function hasProperty<T extends object, U extends keyof T> (obj: T, key: U) {
   return obj[key] ? obj[key] : false
 }
+
+export const loadScript = (url: string) => {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = url
+    script.async = true
+    script.onload = resolve
+    script.onerror = reject
+    document.body.appendChild(script)
+  })
+}

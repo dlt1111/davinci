@@ -41,6 +41,16 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
   // artifacts, we use it instead
   const fsMemory = middleware.fileSystem
 
+  app.get('/mock/*', (req, res) => {
+    const filePath = path.join(process.cwd(), req.originalUrl)
+    fs.readFile(filePath, (err, file) => {
+      if (err) {
+        res.sendStatus(404)
+      } else {
+        res.send(file.toString())
+      }
+    })
+  })
   app.get('*', (req, res) => {
     fsMemory.readFile(path.join(compiler.outputPath, 'index.html'), (err, file) => {
       if (err) {

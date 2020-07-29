@@ -20,7 +20,7 @@
 
 import { ActionTypes } from './constants'
 import { returnType } from 'utils/redux'
-import { IWidgetRaw, IWidgetBase, IWidgetFormed } from './types'
+import { IWidgetRaw, IWidgetBase, IWidgetFormed, ICustomPlugin } from './types'
 
 export const WidgetActions = {
   loadWidgets(projectId: number) {
@@ -179,6 +179,30 @@ export const WidgetActions = {
       payload: {
         sql
       }
+    }
+  },
+
+  loadCustomPlugin(callback?: (data: ICustomPlugin) => void) {
+    return {
+      type: ActionTypes.LOAD_CUSTOM_PLUGIN,
+      payload: {
+        callback
+      }
+    }
+  },
+  loadCustomPluginSucc(data: ICustomPlugin) {
+    return {
+      type: ActionTypes.LOAD_CUSTOM_PLUGIN_SUCCESS,
+      payload: {
+        data
+      }
+    }
+  },
+
+  editCustomPlugin(fieldArr: string[], key: string, value: any) {
+    return {
+      type: ActionTypes.EDIT_CUSTOM_PLUGIN,
+      payload: { fieldArr, key, value }
     }
   }
 }
