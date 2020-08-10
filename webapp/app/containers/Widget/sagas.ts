@@ -1,3 +1,4 @@
+import { CUSTOM_PLUGIN_PATH } from './constants';
 /*
  * <<
  * Davinci
@@ -28,7 +29,7 @@ import { IWidgetRaw, IWidgetFormed, ICustomPlugin } from './types'
 import request from 'utils/request'
 import api from 'utils/api'
 import { errorHandler } from 'utils/util'
-import { loadScript } from 'app/utils/util'
+import { loadResource } from 'app/utils/util'
 
 export function* getWidgets(action: WidgetActionType) {
   if (action.type !== ActionTypes.LOAD_WIDGETS) {
@@ -179,19 +180,20 @@ export function* loadCustomPlugin(action: WidgetActionType) {
     return
   }
   try {
-    const prePath = process.env.NODE_ENV === 'development' ? '/mock' : '/resource'
-    const result = yield call(request, `${prePath}/plugin.js`)
+    const result = yield call(request, CUSTOM_PLUGIN_PATH, {
+      headers: { Accept: 'application/javascript' }
+    })
     const customPlugin: ICustomPlugin = eval(`(${result})`)()
     yield call(async () => {
       if (!customPlugin.isLoaded) {
-        const loadDeps = customPlugin.commonDeps.map((url) => loadScript(url))
+        const loadDeps = customPlugin.commonDeps?.map((url) => loadResource(url))
         await Promise.all(loadDeps)
         customPlugin.isLoaded = true
       }
     })
     yield put(WidgetActions.loadCustomPluginSucc(customPlugin))
   } catch (err) {
-    errorHandler(err)
+    yield put(WidgetActions.loadCustomPluginSucc({isLoaded: true}))
   }
 }
 

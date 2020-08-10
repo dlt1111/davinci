@@ -43,10 +43,13 @@ module.exports = function addDevMiddlewares(app, webpackConfig) {
 
   app.get('/mock/*', (req, res) => {
     const filePath = path.join(process.cwd(), req.originalUrl)
+    const accept = req.get('Accept');
+    const contentType = accept && accept.split(',')[0];
     fs.readFile(filePath, (err, file) => {
       if (err) {
         res.sendStatus(404)
       } else {
+        res.set({'Content-Type': contentType});
         res.send(file.toString())
       }
     })

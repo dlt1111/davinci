@@ -55,8 +55,8 @@ export interface ICustomModule {
   render: (hooks: CustomPluginHooks, id: string) => any | string
 }
 export interface ICustomPlugin {
-  commonDeps: string[]
-  modules: {
+  commonDeps?: string[]
+  modules?: {
     [moduleName: string]: ICustomModule
   },
   isLoaded?: boolean

@@ -55,7 +55,6 @@ export function ChartIndicator (props: IChartIndicatorProps) {
       placement="bottom"
       mouseLeaveDelay={0}
     >
-      {/* TODO: custom plugin icon */}
       <i className={iconClass} onClick={onSelect(props)} />
     </Tooltip>
   )

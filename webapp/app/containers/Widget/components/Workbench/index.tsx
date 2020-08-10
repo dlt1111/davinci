@@ -587,58 +587,61 @@ export class Workbench extends React.Component<IWorkbenchProps & RouteComponentW
         />
         <div className={styles.body}>
           <Suspense fallback={null}>
-            <SplitPane
-              split="vertical"
-              defaultSize={splitSize}
-              minSize={this.defaultSplitSize}
-              maxSize={this.maxSplitSize}
-              onChange={this.saveSplitSize}
-              onDragFinished={this.resizeChart}
-            >
-              <OperatingPanel
-                ref={(f) => this.operatingPanel = f}
-                views={views}
-                originalWidgetProps={originalWidgetProps}
-                originalComputed={originalComputed}
-                selectedView={selectedView}
-                distinctColumnValues={distinctColumnValues}
-                columnValueLoading={columnValueLoading}
-                controls={controls}
-                references={references}
-                cache={cache}
-                autoLoadData={autoLoadData}
-                expired={expired}
-                queryMode={queryMode}
-                multiDrag={multiDrag}
-                computed={computed}
-                customPluginModulesConfig={customPluginModulesConfig}
-                onViewSelect={this.viewSelect}
-                onChangeAutoLoadData={this.changeAutoLoadData}
-                onSetControls={this.setControls}
-                onSetReferences={this.setReferences}
-                onCacheChange={this.cacheChange}
-                onExpiredChange={this.expiredChange}
-                onSetWidgetProps={this.setWidgetProps}
-                onSetComputed={this.setComputed}
-                onDeleteComputed={this.deleteComputed}
-                onLoadData={onLoadViewData}
-                onLoadDistinctValue={onLoadViewDistinctValue}
-              />
-              <div className={styles.viewPanel}>
-                <div className={styles.widgetBlock}>
-                  <Widget
-                    {...widgetProps}
-                    customModuleSelected={customModuleSelected}
-                    loading={<DashboardItemMask.Loading {...maskProps} />}
-                    empty={<DashboardItemMask.Empty {...maskProps} />}
-                    editing={true}
-                    onPaginationChange={this.paginationChange}
-                    onChartStylesChange={this.chartStylesChange}
-                    onEditCustomPlugin={onEditCustomPlugin}
-                  />
+            {
+              customPlugin?.isLoaded &&
+              <SplitPane
+                split="vertical"
+                defaultSize={splitSize}
+                minSize={this.defaultSplitSize}
+                maxSize={this.maxSplitSize}
+                onChange={this.saveSplitSize}
+                onDragFinished={this.resizeChart}
+              >
+                <OperatingPanel
+                  ref={(f) => this.operatingPanel = f}
+                  views={views}
+                  originalWidgetProps={originalWidgetProps}
+                  originalComputed={originalComputed}
+                  selectedView={selectedView}
+                  distinctColumnValues={distinctColumnValues}
+                  columnValueLoading={columnValueLoading}
+                  controls={controls}
+                  references={references}
+                  cache={cache}
+                  autoLoadData={autoLoadData}
+                  expired={expired}
+                  queryMode={queryMode}
+                  multiDrag={multiDrag}
+                  computed={computed}
+                  customPluginModulesConfig={customPluginModulesConfig}
+                  onViewSelect={this.viewSelect}
+                  onChangeAutoLoadData={this.changeAutoLoadData}
+                  onSetControls={this.setControls}
+                  onSetReferences={this.setReferences}
+                  onCacheChange={this.cacheChange}
+                  onExpiredChange={this.expiredChange}
+                  onSetWidgetProps={this.setWidgetProps}
+                  onSetComputed={this.setComputed}
+                  onDeleteComputed={this.deleteComputed}
+                  onLoadData={onLoadViewData}
+                  onLoadDistinctValue={onLoadViewDistinctValue}
+                />
+                <div className={styles.viewPanel}>
+                  <div className={styles.widgetBlock}>
+                    <Widget
+                      {...widgetProps}
+                      customModuleSelected={customModuleSelected}
+                      loading={<DashboardItemMask.Loading {...maskProps} />}
+                      empty={<DashboardItemMask.Empty {...maskProps} />}
+                      editing={true}
+                      onPaginationChange={this.paginationChange}
+                      onChartStylesChange={this.chartStylesChange}
+                      onEditCustomPlugin={onEditCustomPlugin}
+                    />
+                  </div>
                 </div>
-              </div>
-            </SplitPane>
+              </SplitPane>
+            }
           </Suspense>
           <WorkbenchSettingForm
             visible={settingFormVisible}

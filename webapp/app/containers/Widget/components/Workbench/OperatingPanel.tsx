@@ -325,7 +325,11 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       this.setState({
         mode: mode || 'pivot', // FIXME 兼容 0.3.0-beta.1 之前版本
         currentWidgetlibs,
-        ...selectedChart && { chartModeSelectedChart: widgetlibs['chart'].find((wl) => wl.id === selectedChart) },
+        ...selectedChart && {
+          chartModeSelectedChart: widgetlibs['chart'].concat(chartConfigs).find(
+            (wl) => typeof selectedChart === 'number' ? wl.id === selectedChart : wl.name === selectedChart
+          )
+        },
         dataParams: mergedDataParams,
         styleParams: chartStyles,
         showColsAndRows: !!rows.length
@@ -1593,6 +1597,7 @@ export class OperatingPanel extends React.Component<IOperatingPanelProps, IOpera
       </Menu>
     )
 
+    console.log("OperatingPanel -> render -> chartModeSelectedChart", chartModeSelectedChart);
     const dropboxes = Object.entries(dataParams)
       .map(([k, v]) => {
         if (k === 'rows' && !showColsAndRows) {

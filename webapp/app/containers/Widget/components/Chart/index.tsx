@@ -55,7 +55,7 @@ export class CombinedChart extends Component<IChartProps, {}> {
         <Chart {...this.props}/>
       )
       default:
-        return <Custom {...this.props} key={this.props.customModuleSelected.config.chartInfo.name}/>
+        return <Custom {...this.props} key={this.props.customModuleSelected?.config.chartInfo.name}/>
     }
   }
 }

@@ -192,3 +192,23 @@ export const loadScript = (url: string) => {
     document.body.appendChild(script)
   })
 }
+
+export const loadStyle = (url: string) => {
+  return new Promise((resolve, reject) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet'
+    link.href = url
+    link.type = 'text/css'
+    link.onload = resolve
+    link.onerror = reject
+    document.head.appendChild(link)
+  })
+}
+
+export const loadResource = (url: string) => {
+  if (url.endsWith('.js')) {
+    loadScript(url)
+  } else if (url.endsWith('.css')) {
+    loadStyle(url)
+  }
+}

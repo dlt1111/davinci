@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react'
-import { IWidgetWrapperProps } from '../Widget'
-import { loadScript } from 'app/utils/util'
+import React, { useEffect } from 'react'
+import { IWidgetWrapperProps, IChartStyles } from '../Widget'
+import { loadResource } from 'app/utils/util'
 import request from 'app/utils/request'
 
 type THooksEventField = 'mount' | 'update' | 'unmount'
-type THooksMount = (data) => any
-type THooksUpdate = (newData) => any
+type THooksMount = (data: any, style?: IChartStyles) => any
+type THooksUpdate = (newData: any, style?: IChartStyles) => any
 type THooksUnmount = () => any
 interface IHooksEventCallbacks {
   mount: THooksMount
@@ -56,13 +56,13 @@ const CUSTOM_PLUGIN_CONTAINER_ID = '_customPluginContainer'
  */
 const CustomContainer: React.FC<IWidgetWrapperProps> = (props) => {
 
-  const { customModuleSelected, data, onEditCustomPlugin } = props
+  const { customModuleSelected, data, chartStyles, onEditCustomPlugin } = props
 
   useEffect(() => {
     (async () => {
       try {
         if (!customModuleSelected.isLoaded) {
-          const loadDeps = customModuleSelected.deps.map((url) => loadScript(url))
+          const loadDeps = customModuleSelected.deps.map((url) => loadResource(url))
           await Promise.all(loadDeps)
           onEditCustomPlugin(['modules', customModuleSelected.config.chartInfo.name], 'isLoaded', true)
         }
@@ -76,7 +76,7 @@ const CustomContainer: React.FC<IWidgetWrapperProps> = (props) => {
         console.error('plugin render: ' + error)
       }
       try {
-        hooks.events?.mount?.(data)
+        hooks.events?.mount?.(data, chartStyles)
       } catch (error) {
         console.error('plugin mount: ' + error)
       }
@@ -94,7 +94,7 @@ const CustomContainer: React.FC<IWidgetWrapperProps> = (props) => {
   useEffect(() => {
     const { data } = props
     try {
-      hooks.events?.update?.(data)
+      hooks.events?.update?.(data, chartStyles)
     } catch (error) {
       console.error('plugin update: ' + error)
     }

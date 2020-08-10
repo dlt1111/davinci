@@ -55,5 +55,7 @@ enum Types {
 
 export const CUSTOM_ID_LOWEST_LIMIT = 100
 
+export const CUSTOM_PLUGIN_PATH = (process.env.NODE_ENV === 'development' ? '/mock' : '/resource') + '/plugin.js'
+
 export const ActionTypes = createTypes(Types)
 
